@@ -1,29 +1,27 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 
 
 Loading the data:
-```{r, echo = TRUE, results = "hide"}
+
+```r
 setwd("C:/Users/David/Desktop/Coursera/5 Reproducible research/w2 assignment")
 act <- read.csv("activity.csv")
 str(act)
 ```
 
 Setting 'date' variable as class Date:
-```{r, echo = TRUE, results = "hide"}
+
+```r
 act$date <- as.Date(as.character(act$date))
 class(act$date)
 ```
 
 Making a data frame without NA:
-```{r, echo = TRUE, results = "hide"}
+
+```r
 actNA <- is.na(act$steps)
 actClean <- act[!actNA, ]
 str(actClean)
@@ -35,7 +33,8 @@ head(actClean, 20)
 
 
 Calculating the total number of steps taken per day, and fixing labels:
-```{r, echo = TRUE, results = "hide"}
+
+```r
 actDay <- aggregate(act$steps, by = list(act$date), sum)
 head(actDay)
 names(actDay)[1] = "date"
@@ -44,15 +43,30 @@ str(actDay)
 ```
 
 Making a histogram of the total number of steps taken each day:
-```{r, echo = TRUE}
+
+```r
 hist(actDay$steps, main = "Histogram of steps by day", xlab = "Steps by day",
      col = "grey", breaks = 9)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
 Mean and median of the total number of steps taken per day:
-```{r, echo = TRUE}
+
+```r
 mean(actDay$steps, na.rm = T)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(actDay$steps, na.rm = T)
+```
+
+```
+## [1] 10765
 ```
 
 
@@ -60,7 +74,8 @@ median(actDay$steps, na.rm = T)
 
 
 Calculating the average number of steps per interval, and fixing labels:
-```{r, echo = TRUE, results = "hide"}
+
+```r
 actInterval <- aggregate(actClean$steps, by = list(actClean$interval), mean)
 head(actInterval)
 names(actInterval)[1] = "interval"
@@ -69,17 +84,32 @@ str(actInterval)
 ```
 
 Making a time series plot of avg steps by interval:
-```{r, echo = TRUE}
+
+```r
 plot.ts(actInterval$avgSteps,
         main = "Average number of steps by 5-minute interval",
         xlab = "intervals (5 minute)", ylab = "Average number of steps",
         col = "blue")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 Identifying which 5-minute interval contains the maximum number of steps:
-```{r, echo = TRUE}
+
+```r
 which.max(actInterval$avgSteps)
+```
+
+```
+## [1] 104
+```
+
+```r
 max(actInterval$avgSteps)
+```
+
+```
+## [1] 206.1698
 ```
 
 
@@ -87,14 +117,20 @@ max(actInterval$avgSteps)
 
 
 Total number of NAs in the dataset:
-```{r, echo = TRUE}
+
+```r
 sum(actNA)
+```
+
+```
+## [1] 2304
 ```
 
 Imputation method will be based on mean value for the given interval.
 
 Creating a new dataset, but with the missing data filled in:
-```{r, echo = TRUE, results = "hide"}
+
+```r
 actNew <- act
 temp <- 0
 for (i in 1:length(actNew$steps)) {
@@ -107,7 +143,8 @@ for (i in 1:length(actNew$steps)) {
 ```
 
 Calculating the total number of steps taken per day in the new data base, and fixing labels:
-```{r, echo = TRUE, results = "hide"}
+
+```r
 actNewDay <- aggregate(actNew$steps, by = list(actNew$date), sum)
 head(actNewDay)
 names(actNewDay)[1] = "date"
@@ -116,16 +153,31 @@ str(actNewDay)
 ```
 
 Making a histogram of the total number of steps taken each day in the new DB:
-```{r, echo = TRUE}
+
+```r
 hist(actNewDay$steps, main = "Histogram of steps by day (imputed data base)",
      xlab = "Steps by day (imputed data base)",
      col = "red", breaks = 9)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+
 Mean and median of the total number of steps taken per day (imptued DB):
-```{r, echo = TRUE}
+
+```r
 mean(actNewDay$steps)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(actNewDay$steps)
+```
+
+```
+## [1] 10766.19
 ```
 We can notice that, while mean remained the same, new median is 1,19 higher
 
@@ -134,7 +186,8 @@ We can notice that, while mean remained the same, new median is 1,19 higher
 
 
 Creating a new factor variable to diferentiate weekdays from weekends:
-```{r, echo = TRUE, results = "hide"}
+
+```r
 actNew$day <- weekdays(actNew$date)
 actNew$weekend <- ifelse(actNew$day == "Saturday" | actNew$day == "Sunday",
                          "Weekend", "Weekday")
@@ -143,7 +196,8 @@ head(actNew)
 
 Making a time series panel plot of 5-minute interval (x-axis) and average number
 of steps taken, averaged across all weekday days or weekend days (y-axis):
-```{r, echo = TRUE}
+
+```r
 actNewWeekend <- aggregate(actNew$steps,
                            by = list(actNew$weekend, actNew$interval), mean)
 names(actNewWeekend)[1] = "Weekend"
@@ -163,4 +217,6 @@ plot.ts(Wkdy$steps,
         xlab = "intervals (5 minute)", ylab = "Average number of steps",
         col = "red")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
 
